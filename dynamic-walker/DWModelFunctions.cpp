@@ -100,21 +100,20 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 
 
 	//*********************
-	// CREATE THIGHS AND SHANKS\
-
+	// CREATE THIGHS AND SHANKS
 
 	// initialise parent segment
 	OpenSim::Body* parentsegment = pelvis;
 
 	// create and add segments
 	double seglength;
-	//CoordinateSet segpinCoords;
 	OpenSim::Body* legsegment[4];
 	PinJoint* segPinJoint[4];
 	String bodynames[4] = { "LeftThigh", "RightThigh", "LeftShank", "RightShank" };
 	String jointnames[4] = {"LeftThighToPelvis","RightThighToPelvis","LeftShankToThigh","RightShankToThigh"};
 	String pinnames[4] = { "LHip_rz", "RHip_rz", "LKnee_rz", "RKnee_rz" };
 	double locparenty[4] = { 0.0, 0.0, -0.40 / 2, -0.40 / 2 };
+	double locparentz[4] = { -pelvisWidth / 2, pelvisWidth / 2, 0.0, 0.0 };
 	double locchildy[4] = { 0.40 / 2, 0.40 / 2, 0.435 / 2, 0.435 / 2 };
 	double seglengths[4] = { 0.40, 0.40, 0.435, 0.435 };	// left thigh, right thigh, left shank, right shank
 	double pinrangelow[4] = { -100.0, -100.0, -100.0, -100.0 };
@@ -135,7 +134,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 		legsegment[j] = new OpenSim::Body(bodynames[j], mass, comLocInBody, bodyInertia);		
 
 		// connect pelvis to platform with a free joint
-		locationInParent = Vec3(0.0, locparenty[j], 0.0);
+		locationInParent = Vec3(0.0, locparenty[j], locparentz[j]);
 		locationInChild = Vec3(0.0, locchildy[j], 0.0);
 		orientationInParent = Vec3(0.0, 0.0, 0.0);
 		orientationInChild = Vec3(0.0, 0.0, 0.0);
@@ -158,6 +157,36 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 		osimModel.addBody(legsegment[j]);
 
 	}
+
+
+	//*********************
+	// ADD CONTACT GEOMETRY
+
+	// create platform contact geometry
+	ContactHalfSpace* platformContact = new ContactHalfSpace(Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, -Pi / 2), *platform, "PlatformContact");
+	osimModel.addContactGeometry(platformContact);
+
+	// joint contact spheres: initialise parent segment
+	parentsegment = pelvis;
+
+	// model contact spheres
+	double contactSphereRadius = 0.05;
+	Vec3 jointlocinparent(0.0, 0.0, 0.0);
+	ContactSphere* jointcontactspheres[4];
+	String contactnames[4] = { "LHipContact", "RHipContact", "LKneeContact", "RKneeContact" };
+	for (int j = 0; j < 4; j++) {
+		if (j >= 2) parentsegment = legsegment[j - 2];
+		jointlocinparent = Vec3(0.0, locparenty[j], locparentz[4]);
+		jointcontactspheres[j] = new ContactSphere(contactSphereRadius, jointlocinparent, *parentsegment, contactnames[j]);
+		osimModel.addContactGeometry(jointcontactspheres[j]);
+	}
+
+
+	//*********************
+	// ADD HUNT-CROSSLEY FORCES
+
+
+
 
 
 	// Save model to a file
