@@ -11,9 +11,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	//*********************
 	// CREATE EMPTY MODEL
 	
-	// Define key model variables
-	double pelvisWidth = 0.20, thighLength = 0.40, shakLength = 0.435;
-
+	
 	// Create OpenSim Model
 	Model osimModel = Model();
 	osimModel.setName(modelname);
@@ -60,7 +58,8 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	//*********************
 	// CREATE THE PELVIS
 
-	// mass and inertia properties
+	// length, mass and inertia properties
+	double pelvisWidth = 0.20;
 	mass = 1;
 	comLocInBody = Vec3(0.0, 0.0, 0.0);
 	bodyInertia = Inertia(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
@@ -101,10 +100,64 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 
 
 	//*********************
-	// CREATETHIGHS AND SHANKS
+	// CREATE THIGHS AND SHANKS\
 
 
+	// initialise parent segment
+	OpenSim::Body* parentsegment = pelvis;
 
+	// create and add segments
+	double seglength;
+	CoordinateSet segpinCoords;
+	OpenSim::Body* legsegment[4];
+	PinJoint* segPinJoint;
+	String bodynames[4] = { "LeftThigh", "RightThigh", "LeftShank", "RightShank" };
+	String jointnames[4] = {"LeftThighToPelvis","RightThighToPelvis","LeftShankToThigh","RightShankToThigh"};
+	String pinnames[4] = { "LHip_rz", "RHip_rz", "LKnee_rz", "RKnee_rz" };
+	double locparenty[4] = { 0.0, 0.0, -0.40 / 2, -0.40 / 2 };
+	double locchildy[4] = { 0.40 / 2, 0.40 / 2, 0.435 / 2, 0.435 / 2 };
+	double seglengths[4] = { 0.40, 0.40, 0.435, 0.435 };	// left thigh, right thigh, left shank, right shank
+	double pinrangelow[4] = { -100, -100, 0.0, 0.0 };
+	double pinrangeupp[4] = { 100, 100, 0.0, 0.0 };
+	double pindefaults[4] = { -10.0, 30.0, -30.0, -30.0 };
+	for (int j = 0; j < 4; j++) {
+
+		// update parent segment
+		if (j >= 2) parentsegment = legsegment[j - 2];
+
+		// length, mass and inertia (mass and inertia common to all thigh and shank segments)
+		seglength = seglengths[j];
+		mass = 1;
+		comLocInBody = Vec3(0.0, 0.0, 0.0);
+		bodyInertia = Inertia(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
+
+		// create pelvis body
+		legsegment[j] = new OpenSim::Body(bodynames[j], mass, comLocInBody, bodyInertia);		
+
+		// connect pelvis to platform with a free joint
+		locationInParent = Vec3(0.0, locparenty[j], 0.0);
+		locationInChild = Vec3(0.0, locchildy[j], 0.0);
+		orientationInParent = Vec3(0.0, 0.0, 0.0);
+		orientationInChild = Vec3(0.0, 0.0, 0.0);
+		segPinJoint = new PinJoint(pinnames[j], *parentsegment, locationInParent, orientationInParent, *legsegment[j], locationInChild, orientationInChild);
+
+		// set joint properties, rotate about z-axis
+		segpinCoords = segPinJoint->upd_CoordinateSet();
+		segpinCoords[0].setName(pinnames[j]);
+		rotRangePlatform[0] = convertDegreesToRadians(pinrangelow[j]);
+		rotRangePlatform[1] = convertDegreesToRadians(pinrangeupp[j]);
+		segpinCoords[0].setRange(rotRangePlatform);
+		segpinCoords[0].setDefaultValue(convertDegreesToRadians(pindefaults[j]));
+		segpinCoords[0].setDefaultLocked(true);
+
+		// add display geometry to pelvis
+		legsegment[j]->addDisplayGeometry("sphere.vtp");
+		legsegment[j]->updDisplayer()->setScaleFactors(Vec3(seglength / 10.0, seglength, seglength / 10.0));
+
+		// add pelvis to model
+		osimModel.addBody(legsegment[j]);
+
+	}
 
 
 	// Save model to a file
