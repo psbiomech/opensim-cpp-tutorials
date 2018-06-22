@@ -1,4 +1,4 @@
 # ignore build directores of Visual Studio Projects
 
+# passive dynamic walker
 dynamic-walker/build/
-

@@ -108,17 +108,17 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 
 	// create and add segments
 	double seglength;
-	CoordinateSet segpinCoords;
+	//CoordinateSet segpinCoords;
 	OpenSim::Body* legsegment[4];
-	PinJoint* segPinJoint;
+	PinJoint* segPinJoint[4];
 	String bodynames[4] = { "LeftThigh", "RightThigh", "LeftShank", "RightShank" };
 	String jointnames[4] = {"LeftThighToPelvis","RightThighToPelvis","LeftShankToThigh","RightShankToThigh"};
 	String pinnames[4] = { "LHip_rz", "RHip_rz", "LKnee_rz", "RKnee_rz" };
 	double locparenty[4] = { 0.0, 0.0, -0.40 / 2, -0.40 / 2 };
 	double locchildy[4] = { 0.40 / 2, 0.40 / 2, 0.435 / 2, 0.435 / 2 };
 	double seglengths[4] = { 0.40, 0.40, 0.435, 0.435 };	// left thigh, right thigh, left shank, right shank
-	double pinrangelow[4] = { -100, -100, 0.0, 0.0 };
-	double pinrangeupp[4] = { 100, 100, 0.0, 0.0 };
+	double pinrangelow[4] = { -100.0, -100.0, -100.0, -100.0 };
+	double pinrangeupp[4] = { 100.0, 100.0, 0.0, 0.0 };
 	double pindefaults[4] = { -10.0, 30.0, -30.0, -30.0 };
 	for (int j = 0; j < 4; j++) {
 
@@ -139,10 +139,10 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 		locationInChild = Vec3(0.0, locchildy[j], 0.0);
 		orientationInParent = Vec3(0.0, 0.0, 0.0);
 		orientationInChild = Vec3(0.0, 0.0, 0.0);
-		segPinJoint = new PinJoint(pinnames[j], *parentsegment, locationInParent, orientationInParent, *legsegment[j], locationInChild, orientationInChild);
+		segPinJoint[j] = new PinJoint(pinnames[j], *parentsegment, locationInParent, orientationInParent, *legsegment[j], locationInChild, orientationInChild);
 
 		// set joint properties, rotate about z-axis
-		segpinCoords = segPinJoint->upd_CoordinateSet();
+		CoordinateSet& segpinCoords = segPinJoint[j]->upd_CoordinateSet();
 		segpinCoords[0].setName(pinnames[j]);
 		rotRangePlatform[0] = convertDegreesToRadians(pinrangelow[j]);
 		rotRangePlatform[1] = convertDegreesToRadians(pinrangeupp[j]);
