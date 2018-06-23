@@ -20,7 +20,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	OpenSim::Body& ground = osimModel.getGroundBody();
 
 	// Define gravitational acceleration
-	osimModel.setGravity(Vec3(0, -0.98665, 0));
+	osimModel.setGravity(Vec3(0, -0.980665, 0));
 
 
 	//*********************
@@ -76,7 +76,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 
 	// set joint properties, rotate about z-axis
 	CoordinateSet& pelvisJointCoords = pelvisToPlatform->upd_CoordinateSet();
-	String coordnames[6] = { "pelvis_rx", "pelvis_ry", "pelvis_rz", "pelvis_tx", "pelvis_tx", "pelvis_tx" };
+	String coordnames[6] = { "pelvis_rx", "pelvis_ry", "pelvis_rz", "pelvis_tx", "pelvis_ty", "pelvis_tz" };
 	double rangelower[6] = { -Pi, -Pi, -Pi, -10.0, -1.0, -1.0 };
 	double rangeupper[6] = { Pi, Pi, Pi, 10.0, 2.0, 1.0 };
 	double defvals[6] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
@@ -212,7 +212,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 
 	//*********************'
 	// ADD COORDINATE LIMITING FORCES
-0
+
 	// limiting force parameters
 	double lstiffness = 1E6, ldamping = 1E5;
 	double transition = 5; // degrees
@@ -220,9 +220,13 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	// create limiting force
 	OpenSim::CoordinateLimitForce* jointLimitForce[4];
 	for (int j = 0; j < 4; j++) {
-		jointLimitForce[j] = OpenSim::CoordinateLimitForce(pinnames[j], pinrangeupp[j], pinrangelow[j], lstiffness, lstiffness, ldamping, transition);
+		jointLimitForce[j] = new OpenSim::CoordinateLimitForce(pinnames[j], pinrangeupp[j], lstiffness, pinrangelow[j], lstiffness, ldamping, transition);
+		osimModel.addForce(jointLimitForce[j]);
 	}
 	
+
+	//*********************'
+	// PRINT OSIM FILE AND RETURN
 
 	// Save model to a file
 	osimModel.print(modelname + ".osim");

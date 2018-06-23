@@ -20,9 +20,10 @@ int main()
 		String modelname = "DynamicWalkerModel";
 		Model osimModel = createDynamicWalkerModel(modelname);
 
+		// Simulate model
 
 
-
+		return 0;
 	}
 	catch (OpenSim::Exception ex)
 	{
