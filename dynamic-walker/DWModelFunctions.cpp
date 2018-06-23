@@ -112,13 +112,14 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	String bodynames[4] = { "LeftThigh", "RightThigh", "LeftShank", "RightShank" };
 	String jointnames[4] = {"LeftThighToPelvis","RightThighToPelvis","LeftShankToThigh","RightShankToThigh"};
 	String pinnames[4] = { "LHip_rz", "RHip_rz", "LKnee_rz", "RKnee_rz" };
-	double locparenty[4] = { 0.0, 0.0, -0.40 / 2, -0.40 / 2 };
-	double locparentz[4] = { -pelvisWidth / 2, pelvisWidth / 2, 0.0, 0.0 };
+	double locparenty[6] = { 0.0, 0.0, -0.40 / 2, -0.40 / 2, -0.435 / 2,-0.435 / 2 };
+	double locparentz[6] = { -pelvisWidth / 2, pelvisWidth / 2, 0.0, 0.0, 0.0, 0.0 };
 	double locchildy[4] = { 0.40 / 2, 0.40 / 2, 0.435 / 2, 0.435 / 2 };
 	double seglengths[4] = { 0.40, 0.40, 0.435, 0.435 };	// left thigh, right thigh, left shank, right shank
 	double pinrangelow[4] = { -100.0, -100.0, -100.0, -100.0 };
 	double pinrangeupp[4] = { 100.0, 100.0, 0.0, 0.0 };
 	double pindefaults[4] = { -10.0, 30.0, -30.0, -30.0 };
+	bool pindeflocked[4] = { false,false,true,true };
 	for (int j = 0; j < 4; j++) {
 
 		// update parent segment
@@ -147,7 +148,7 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 		rotRangePlatform[1] = convertDegreesToRadians(pinrangeupp[j]);
 		segpinCoords[0].setRange(rotRangePlatform);
 		segpinCoords[0].setDefaultValue(convertDegreesToRadians(pindefaults[j]));
-		segpinCoords[0].setDefaultLocked(true);
+		segpinCoords[0].setDefaultLocked(pindeflocked[j]);
 
 		// add display geometry to pelvis
 		legsegment[j]->addDisplayGeometry("sphere.vtp");
@@ -169,14 +170,14 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	// joint contact spheres: initialise parent segment
 	parentsegment = pelvis;
 
-	// model contact spheres
+	// model contact spheres (hips and knees)
 	double contactSphereRadius = 0.05;
 	Vec3 jointlocinparent(0.0, 0.0, 0.0);
-	ContactSphere* jointcontactspheres[4];
-	String contactnames[4] = { "LHipContact", "RHipContact", "LKneeContact", "RKneeContact" };
-	for (int j = 0; j < 4; j++) {
+	ContactSphere* jointcontactspheres[6];
+	String contactnames[6] = { "LHipContact", "RHipContact", "LKneeContact", "RKneeContact","LFootContact","RFootContact" };
+	for (int j = 0; j < 6; j++) {
 		if (j >= 2) parentsegment = legsegment[j - 2];
-		jointlocinparent = Vec3(0.0, locparenty[j], locparentz[4]);
+		jointlocinparent = Vec3(0.0, locparenty[j], locparentz[j]);
 		jointcontactspheres[j] = new ContactSphere(contactSphereRadius, jointlocinparent, *parentsegment, contactnames[j]);
 		osimModel.addContactGeometry(jointcontactspheres[j]);
 	}
@@ -185,9 +186,43 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	//*********************
 	// ADD HUNT-CROSSLEY FORCES
 
+	// create contact model parameters
+	double stiffness = 1E7, dissipation = 0.1;
+	double staticFriction = 0.6, dynamicFriction = 0.4, viscosity = 0.01;
+	
+	// create and apply contact force models
+	OpenSim::HuntCrossleyForce* jointContactForce[6];
+	OpenSim::HuntCrossleyForce::ContactParameters* jointContactParameters[6];
+	for (int j = 0; j < 6; j++) {
+		
+		// create contact parameters object
+		jointContactParameters[j] = new OpenSim::HuntCrossleyForce::ContactParameters(stiffness, dissipation, staticFriction, dynamicFriction, viscosity);
 
+		// select which contact geometries between which contact model is to be applied
+		jointContactParameters[j]->addGeometry(contactnames[j]);
+		jointContactParameters[j]->addGeometry("PlatformContact");
 
+		// create the force model
+		jointContactForce[j] = new OpenSim::HuntCrossleyForce(jointContactParameters[j]);
 
+		// add force model to the OpenSim model
+		osimModel.addForce(jointContactForce[j]);
+	}
+	
+
+	//*********************'
+	// ADD COORDINATE LIMITING FORCES
+0
+	// limiting force parameters
+	double lstiffness = 1E6, ldamping = 1E5;
+	double transition = 5; // degrees
+
+	// create limiting force
+	OpenSim::CoordinateLimitForce* jointLimitForce[4];
+	for (int j = 0; j < 4; j++) {
+		jointLimitForce[j] = OpenSim::CoordinateLimitForce(pinnames[j], pinrangeupp[j], pinrangelow[j], lstiffness, lstiffness, ldamping, transition);
+	}
+	
 
 	// Save model to a file
 	osimModel.print(modelname + ".osim");
