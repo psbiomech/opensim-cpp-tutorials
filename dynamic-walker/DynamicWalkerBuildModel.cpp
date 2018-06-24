@@ -21,7 +21,11 @@ int main()
 		Model osimModel = createDynamicWalkerModel(modelname);
 
 		// Simulate model
-
+		double inittime = 0.0, finaltime = 1.0;
+		bool isdeg[11] = { true, true, true, true, false, false, false, true, true, true, true };
+		double qs[11] = { -10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -10.0, 30.0, -30.0, -30.0 };
+		double dqs[11] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+		simulateDynamicWalkerModel(osimModel,isdeg,qs,dqs,inittime,finaltime);
 
 		return 0;
 	}

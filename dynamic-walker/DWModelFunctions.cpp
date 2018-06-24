@@ -4,7 +4,7 @@ using namespace OpenSim;
 using namespace SimTK;
 
 
-// Create an empty model
+// Create the dynamic walker model
 OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 {
 	
@@ -225,11 +225,62 @@ OpenSim::Model createDynamicWalkerModel(SimTK::String modelname)
 	}
 	
 
+
 	//*********************'
 	// PRINT OSIM FILE AND RETURN
+
+	// add a force reporter analysis to the model
+	ForceReporter* reporter = new OpenSim::ForceReporter(&osimModel);
+	osimModel.addAnalysis(reporter);
 
 	// Save model to a file
 	osimModel.print(modelname + ".osim");
 
 	return osimModel;
+}
+
+
+// simulate the dynamic walker model
+int simulateDynamicWalkerModel(OpenSim::Model osimModel, bool *isdeg, double *qs, double *dqs, double inittime, double finaltime) {
+
+	// build and initialise the multibody system
+	SimTK::State& si = osimModel.initSystem();
+
+	// set the initial values for the system
+	CoordinateSet& modelCoordinateSet = osimModel.updCoordinateSet();
+	for (int i = 0; i < 11; i++) {
+		if (isdeg[i] == true) {
+			qs[i] = convertDegreesToRadians(qs[i]);
+			dqs[i] = convertDegreesToRadians(dqs[i]);
+		}
+		modelCoordinateSet[i].setValue(si, qs[i]);
+		modelCoordinateSet[i].setSpeedValue(si, dqs[i]);
+	}
+
+	// create the integrator
+	SimTK::RungeKuttaMersonIntegrator integrator(osimModel.getMultibodySystem());
+	integrator.setAccuracy(1.0E-8);
+
+	// create the manager for the simulation
+	Manager manager(osimModel, integrator);
+	manager.setInitialTime(inittime);
+	manager.setFinalTime(finaltime);
+	
+	// perform the simulation
+	std::cout << "\n\nIntegrating from " << inittime << "to" << finaltime << std::endl;
+	manager.integrate(si);
+
+	// print states
+	Storage statesOutput(manager.getStateStorage());
+	statesOutput.print("DynamicWalker_states.sto");
+	osimModel.updSimbodyEngine().convertRadiansToDegrees(statesOutput);
+	statesOutput.setWriteSIMMHeader(true);
+	statesOutput.print("DynamicWalker_states_degrees.sto");
+
+	// print forces
+	OpenSim::AnalysisSet analyses = osimModel.getAnalysisSet();
+	analyses[0].printResults("DynamicWalker");
+
+
+	return 0;
 }
