@@ -2,3 +2,6 @@
 
 # passive dynamic walker
 dynamic-walker/build/
+
+# arm muscle optimisation
+optimisation-arm/build/
