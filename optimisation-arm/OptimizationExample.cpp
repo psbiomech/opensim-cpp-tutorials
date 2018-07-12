@@ -39,7 +39,6 @@ using namespace SimTK;
 using namespace std;
 
 
-
 //______________________________________________________________________________
 /**
  * Define an optimization problem that finds a set of muscle controls to maximize 
@@ -49,9 +48,100 @@ int main()
 {
 	try {
 
+		// optimiser parameters
+		int stepCount = 0;
+		double initialTime = 0.0;
+		double finalTime = 0.25;
+		double bestSoFar = Infinity;
+
+		// create a timer
+		std::clock_t startTime = std::clock();
+
+
+		//********************
+		// INITIALISE THE MODEL
+
+		// create OpenSim model object from XML file
+		Model osimModel("Arm26_Optimize.osim");
+
+		// define initial states of muscles
+		const Set<Muscle> &muscleSet = osimModel.getMuscles();
+		for (int i = 0; i < muscleSet.getSize(); i++) {
+
+			// get pointer to muscle fibre properties
+			ActivationFiberLengthMuscle* mus = dynamic_cast<ActivationFiberLengthMuscle*> (&muscleSet[i]);
+
+			//  set the state
+			if (mus) {
+				mus->setDefaultActivation(0.5);
+				mus->setDefaultFiberLength(0.1);
+			}
+
+		}
+
+		// initialise the system and get the current state
+		State& si = osimModel.initSystem();
+
+		// make sure the muscle states are in equilibrium
+		osimModel.equilibrateMuscles(si);
+
 		
 
+		//********************
+		// CREATE AND RUN THE OPTIMISER
 
+
+		// get the number of controls
+		int numControls = osimModel.getNumControls();
+
+		// initialise our custom objective function
+		ExampleOptimizationSystem sys(numControls, si, osimModel, stepCount, bestSoFar, initialTime, finalTime);
+		
+		// optimisation bounds
+		Vector controls(numControls, 0.01);
+		Vector lbounds(numControls, 0.01);
+		Vector ubounds(numControls, 0.99);
+		sys.setParameterLimits(lbounds, ubounds);
+
+		// create the optimiser (LBFGSB: limited-memory Broyden-Fletcher-Goldfarb-Shanno algorithm; gradient descent, with simple bounds).
+		Optimizer opt(sys, SimTK::LBFGSB);
+
+		// specify settings for the optimiser
+		opt.setConvergenceTolerance(0.05);
+		opt.useNumericalGradient(true);
+		opt.setMaxIterations(1000);
+		opt.setLimitedMemoryHistory(500);
+
+		// run the optimiser
+		Real f = NaN;
+		f = opt.optimize(controls);
+
+
+
+		//********************
+		// OUTPUT RESULTS
+
+		// time
+		cout << "Elapsed time = " << (std::clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
+
+		// controls
+		const Set<Actuator>& actuators = osimModel.getActuators();
+		for (int i = 0; i < actuators.getSize(); ++i) {
+			cout << actuators[i].getName() << " control value = " << controls[i] << endl;
+		}
+
+		// maximum forward velocity
+		cout << "\nMaximum hand velocity = " << -f << "m/s" << endl;
+		cout << "OpenSim example completed successfully.\n";
+
+		// Dump out optimization results to a text file for testing
+		ofstream ofile;
+		ofile.open("Arm26_optimization_result");
+		for (int i = 0; i<actuators.getSize(); ++i){
+			ofile << controls[i] << endl;
+		}
+		ofile << -f << endl;
+		ofile.close();
 
 
 	}

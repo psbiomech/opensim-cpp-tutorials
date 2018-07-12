@@ -1,4 +1,5 @@
 #include <OpenSim/OpenSim.h>
+#include "DWModelFunctions.h"
 
 using namespace OpenSim;
 using namespace SimTK;
