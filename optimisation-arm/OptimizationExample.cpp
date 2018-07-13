@@ -21,12 +21,11 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-/* 
- *  Example of an OpenSim program that optimizes the performance of a model.
- *  The main() loads the arm26 model and maximizes the forward velocity of
- *  the hand during a muscle-driven forward simulation by finding the set
- *  of (constant) controls.
- */
+/* Optimisation example, implemented with cost function defined externally
+ * rather than within the same file as the main() function.
+ *
+ * Prasanna Sritharan, July 2018 */
+
 
 //==============================================================================
 //==============================================================================

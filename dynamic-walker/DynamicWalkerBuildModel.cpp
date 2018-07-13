@@ -1,3 +1,11 @@
+/* OpenSim Dynamic walker tutorial
+ * Implemented using additional functions defined externally, rather than
+ * everything defined in the main() function as per the online solutions.
+ *
+ * Prasanna Sritharan, July 2018 */
+
+
+
 //= == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == =
 #include <OpenSim/OpenSim.h>
 #include "DWModelFunctions.h"

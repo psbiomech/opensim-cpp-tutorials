@@ -1,3 +1,6 @@
+// Function declarations for dynamics walker tutorial
+// Prasanna Sritharan, July 2018
+
 #ifndef _createDWModel_h_
 #define _createDWModel_h_
 

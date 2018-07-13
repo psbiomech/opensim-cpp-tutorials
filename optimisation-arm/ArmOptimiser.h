@@ -1,3 +1,7 @@
+// Cost function declarations for arm optimisation example
+// Prasanna Sritharan, July 2018
+
+
 #ifndef _armopt_
 #define _armopt_
 

@@ -2,6 +2,9 @@
 ## For building with the rest of OpenSim ##
 ###########################################
 
+# Modified by Prasanna Sritharan, July 2018
+
+
 cmake_minimum_required(VERSION 2.6)
 
 # Define project

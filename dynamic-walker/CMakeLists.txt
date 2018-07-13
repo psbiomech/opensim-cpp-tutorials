@@ -2,6 +2,11 @@
 # CMake file for building an OpenSim project
 # Author: The OpenSim Team
 #------------------------------------------------------------------------
+
+# Modified by Prasanna Sritharan, July 2018
+
+
+
 cmake_minimum_required(VERSION 2.6)
 project(DynamicWalker)
 

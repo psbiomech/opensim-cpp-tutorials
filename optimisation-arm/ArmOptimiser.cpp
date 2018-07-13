@@ -1,3 +1,7 @@
+// Cost function definitions for arm optimisation example
+// Prasanna Sritharan, July 2018
+
+
 #include <OpenSim/OpenSim.h>
 #include "ArmOptimiser.h"
 

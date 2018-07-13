@@ -1,3 +1,6 @@
+// Function definitions for dynamics walker tutorial
+// Prasanna Sritharan, July 2018
+
 #include <OpenSim/OpenSim.h>
 #include "DWModelFunctions.h"
 
