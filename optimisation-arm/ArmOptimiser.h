@@ -14,7 +14,7 @@ private:
 	double itime;
 	double ftime;
 	mutable int steps;
-	mutable SimTK::Real& bestf;	
+	mutable SimTK::Real bestf;	
 
 // methods
 public:

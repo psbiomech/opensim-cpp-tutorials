@@ -9,7 +9,7 @@ using namespace std;
 
 // constructor class, parameters accessed in objectiveFunc()
 ExampleOptimizationSystem::ExampleOptimizationSystem(int numParameters, State& s, Model& aModel, int stepCount, double bestSoFar, double initialTime, double finalTime) :
-numControls(numParameters), si(s), osimModel(aModel), steps(stepCount), bestf(bestSoFar), itime(initialTime), ftime(finalTime) {};
+numControls(numParameters), OptimizerSystem(numParameters), si(s), osimModel(aModel), steps(stepCount), bestf(bestSoFar), itime(initialTime), ftime(finalTime) {}
 
 
 
@@ -38,9 +38,9 @@ int ExampleOptimizationSystem::objectiveFunc(const Vector &newControls, const bo
 	// calculate value of cost function (arm COM forward velocity to be maximised)
 	Vec3 massCenter;
 	Vec3 velocity;
-	osimModel.getBodySet().get("r_radius_ulna_hand").getMassCenter(massCenter);
+	osimModel.getBodySet().get("r_ulna_radius_hand").getMassCenter(massCenter);
 	osimModel.getMultibodySystem().realize(s, Stage::Velocity);
-	osimModel.getSimbodyEngine().getVelocity(s, osimModel.getBodySet().get("r_radius_ulna_hand"), massCenter, velocity);
+	osimModel.getSimbodyEngine().getVelocity(s, osimModel.getBodySet().get("r_ulna_radius_hand"), massCenter, velocity);
 	f = -velocity[0];	// maximise by multiplying by -1
 	steps++;
 
@@ -75,4 +75,4 @@ int ExampleOptimizationSystem::objectiveFunc(const Vector &newControls, const bo
 
 	return 0;
 	
-};
+}

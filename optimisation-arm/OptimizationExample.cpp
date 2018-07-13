@@ -31,7 +31,6 @@
 //==============================================================================
 //==============================================================================
 #include <OpenSim/OpenSim.h>
-#include <ctime>  // clock(), clock_t, CLOCKS_PER_SEC
 #include "ArmOptimiser.h"
 
 using namespace OpenSim;
@@ -53,9 +52,6 @@ int main()
 		double initialTime = 0.0;
 		double finalTime = 0.25;
 		double bestSoFar = Infinity;
-
-		// create a timer
-		std::clock_t startTime = std::clock();
 
 
 		//********************
@@ -103,7 +99,7 @@ int main()
 		Vector ubounds(numControls, 0.99);
 		sys.setParameterLimits(lbounds, ubounds);
 
-		// create the optimiser (LBFGSB: limited-memory Broyden-Fletcher-Goldfarb-Shanno algorithm; gradient descent, with simple bounds).
+		// create the optimiser (LBFGSB: limited-memory Broyden-Fletcher-Goldfarb-Shanno algorithm, gradient descent, with simple bounds).
 		Optimizer opt(sys, SimTK::LBFGSB);
 
 		// specify settings for the optimiser
@@ -121,8 +117,6 @@ int main()
 		//********************
 		// OUTPUT RESULTS
 
-		// time
-		cout << "Elapsed time = " << (std::clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
 
 		// controls
 		const Set<Actuator>& actuators = osimModel.getActuators();
@@ -136,7 +130,7 @@ int main()
 
 		// Dump out optimization results to a text file for testing
 		ofstream ofile;
-		ofile.open("Arm26_optimization_result");
+		ofile.open("Arm26_optimization_result.txt");
 		for (int i = 0; i<actuators.getSize(); ++i){
 			ofile << controls[i] << endl;
 		}
