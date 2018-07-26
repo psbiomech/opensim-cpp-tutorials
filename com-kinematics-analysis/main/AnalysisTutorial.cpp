@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
 
-	// test
+	// test if cmake worked
 	cout << "Test" << endl;
 
 }
