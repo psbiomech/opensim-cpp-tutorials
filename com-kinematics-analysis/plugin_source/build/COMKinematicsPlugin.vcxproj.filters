@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\COMKinematicsPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\RegisterTypes_osimPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\COMKinematicsPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\RegisterTypes_osimPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\osimPluginDLL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\plugin_source\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{8CDC6E93-8FF4-3B2A-A7FD-43611EFE43A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{CA26A357-C23D-3BA5-9458-99E343217070}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
