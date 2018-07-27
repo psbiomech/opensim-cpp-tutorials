@@ -2,7 +2,7 @@
 <OpenSimDocument Version="20302">
 	<AnalyzeTool name="subject01">
 		<!--Name of the .osim file used to construct a model.-->
-		<model_file> subject01_simbody_adjusted.osim </model_file>
+		<model_file> C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\main\test_data\subject01_simbody_adjusted.osim </model_file>
 		<!--Replace the model's force set with sets specified in
 		    <force_set_files>? If false, the force set is appended to.-->
 		<results_directory> Results </results_directory>
@@ -14,7 +14,7 @@
 		<final_time>       4.00000000 </final_time>
 		<AnalysisSet name="Analyses">
 			<objects>
-				<AnalysisPlugin_Template name="AnalysisPlugin_Template">
+				<COMKinematicsPlugin name="COMKinematicsPlugin">
 					<!--Flag (true or false) specifying whether whether on. True by default.-->
 					<on> true </on>
 					<!--Start time.-->
@@ -31,14 +31,14 @@
 					<in_degrees> true </in_degrees>
 
 					<body_names> all </body_names>
-				</AnalysisPlugin_Template>
+				</COMKinematicsPlugin>
 			</objects>
 			<groups/>
 		</AnalysisSet>
 		<!--Motion file (.mot) or storage file (.sto) containing the time history
 		    of the generalized coordinates for the model. These can be specified
 		    in place of the states file.-->
-		<coordinates_file> subject01_walk1_ik.mot </coordinates_file>
+		<coordinates_file> C:\Users\psritharan\Documents\03 Projects\opensim-cpp-tutorials\com-kinematics-analysis\main\test_data\subject01_walk1_ik.mot </coordinates_file>
 		<!--Storage file (.sto) containing the time history of the generalized
 		    speeds for the model. If coordinates_file is used in place of
 		    states_file, these can be optionally set as well to give the speeds.

@@ -32,8 +32,6 @@ set(SOURCE AnalysisTutorial.cpp CACHE STRING "Name of the source files.")
 set(PLUGIN_HEADER_PATH "${CMAKE_SOURCE_DIR}/plugin/include/" CACHE STRING "Folder containing plugin header files")
 set(PLUGIN_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/plugin/libraries/" CACHE STRING "Folder containing plugin .lib file")
 
-
-
 # Include headers.
 include_directories(${OPENSIMSIMBODY_INCLUDE_DIRS} ${PLUGIN_HEADER_PATH})
 
@@ -45,3 +43,18 @@ target_link_libraries(${TARGET} ${OPENSIMSIMBODY_LIBRARIES}  "${PLUGIN_LIBRARY_P
 
 # set Visual Studio start-up project.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET})
+
+# post-build copy DLLs
+add_custom_command(
+	TARGET ${TARGET} POST_BUILD
+
+	# make bin folders
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/RelWithDebInfo/"
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/Release/"
+	
+	# DLLs
+	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/plugin/libraries/COMKinematicsPlugin.dll" "${CMAKE_BINARY_DIR}/RelWithDebInfo/"
+	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/plugin/libraries/COMKinematicsPlugin.dll" "${CMAKE_BINARY_DIR}/Release/"
+)
+
+
