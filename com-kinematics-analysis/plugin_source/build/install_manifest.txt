@@ -1,2 +1,0 @@
-C:/OpenSim 3.3/plugins/COMKinematicsPlugin.lib
-C:/OpenSim 3.3/plugins/COMKinematicsPlugin.dll
