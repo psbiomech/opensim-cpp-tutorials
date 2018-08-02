@@ -169,6 +169,19 @@ setupStorage()
 	_storePos.setName("Positions");
 	_storePos.setDescription(getDescription());
 	_storePos.setColumnLabels(getColumnLabels());
+
+	// Velocities
+	_storeVel.reset(0);
+	_storeVel.setName("Velocities");
+	_storeVel.setDescription(getDescription());
+	_storeVel.setColumnLabels(getColumnLabels());
+
+	// Accelerations
+	_storeAcc.reset(0);
+	_storeAcc.setName("Accelerations");
+	_storeAcc.setDescription(getDescription());
+	_storeAcc.setColumnLabels(getColumnLabels());
+
 }
 
 
@@ -194,9 +207,13 @@ setModel(Model& aModel)
 	constructColumnLabels();
 	setupStorage();
 
-	//Setup size of work array to hold body positions
+	// Get number of bodies
 	int numBodies = _bodyIndices.getSize();
-	_bodypos.setSize(6*numBodies);
+	
+	// Size arrays for positions, velocities and accelerations
+	_bodypos.setSize(6 * numBodies);
+	_bodyvel.setSize(6 * numBodies);
+	_bodyacc.setSize(6 * numBodies);
 }
 
 
@@ -226,8 +243,11 @@ record(const SimTK::State& s)
 	// GROUND BODY
 	const Body& ground = _model->getGroundBody();
 
-	// POSITION
+	// get model body set
 	const BodySet& bodySet = _model->getBodySet();
+
+	// realise state to acceleration stage
+	_model->getMultibodySystem().realize(s, SimTK::Stage::Acceleration);
 
 	for(int i=0;i<_bodyIndices.getSize();i++) {
 
@@ -235,27 +255,75 @@ record(const SimTK::State& s)
 		SimTK::Vec3 com;
 		body.getMassCenter(com);
 
-		// GET POSITIONS AND EULER ANGLES
+		// get positions and Euler angles
 		_model->getSimbodyEngine().getPosition(s,body,com,vec);
 		_model->getSimbodyEngine().getDirectionCosines(s,body,dirCos);
 		_model->getSimbodyEngine().convertDirectionCosinesToAngles(dirCos,
 			&angVec[0],&angVec[1],&angVec[2]);
 
-		// CONVERT TO DEGREES?
+		// convert to degrees
 		if(getInDegrees()) {
 			angVec *= SimTK_RADIAN_TO_DEGREE;
 		}			
 
-		// FILL KINEMATICS ARRAY
+		// fill kinematics array
 		int I=6*i;
 		memcpy(&_bodypos[I],&vec[0],3*sizeof(double));
 		memcpy(&_bodypos[I+3],&angVec[0],3*sizeof(double));
 	}
 	_storePos.append(s.getTime(),_bodypos.getSize(),&_bodypos[0]);
 
+
+	// ********************
 	// VELOCITY 
 
+	for (int i = 0; i<_bodyIndices.getSize(); i++) {
+
+		const Body& body = bodySet.get(_bodyIndices[i]);
+		SimTK::Vec3 com;
+		body.getMassCenter(com);
+
+		// get positions and Euler angles
+		_model->getSimbodyEngine().getVelocity(s, body, com, vec);
+		_model->getSimbodyEngine().getAngularVelocity(s, body, angVec);
+
+		// convert to degrees
+		if (getInDegrees()) {
+			angVec *= SimTK_RADIAN_TO_DEGREE;
+		}
+
+		// fill kinematics array
+		int I = 6 * i;
+		memcpy(&_bodyvel[I], &vec[0], 3 * sizeof(double));
+		memcpy(&_bodyvel[I + 3], &angVec[0], 3 * sizeof(double));
+	}
+	_storeVel.append(s.getTime(), _bodyvel.getSize(), &_bodyvel[0]);
+
+
 	// ACCELERATIONS
+	// ********************
+
+	for (int i = 0; i<_bodyIndices.getSize(); i++) {
+
+		const Body& body = bodySet.get(_bodyIndices[i]);
+		SimTK::Vec3 com;
+		body.getMassCenter(com);
+
+		// get positions and Euler angles
+		_model->getSimbodyEngine().getAcceleration(s, body, com, vec);
+		_model->getSimbodyEngine().getAngularAcceleration(s, body, angVec);
+
+		// convert to degrees
+		if (getInDegrees()) {
+			angVec *= SimTK_RADIAN_TO_DEGREE;
+		}
+
+		// fill kinematics array
+		int I = 6 * i;
+		memcpy(&_bodyacc[I], &vec[0], 3 * sizeof(double));
+		memcpy(&_bodyacc[I + 3], &angVec[0], 3 * sizeof(double));
+	}
+	_storeAcc.append(s.getTime(), _bodyacc.getSize(), &_bodyacc[0]);
 
 
 	return(0);
@@ -285,6 +353,8 @@ begin(SimTK::State& s)
 
 	// RESET STORAGE
 	_storePos.reset(s.getTime());  //->reset(s.getTime());
+	_storeVel.reset(s.getTime());
+	_storeAcc.reset(s.getTime());
 
 	// RECORD
 	int status = 0;
@@ -380,12 +450,13 @@ printResults(const string &aBaseName,const string &aDir,double aDT,
 {
 	// POSITIONS
 	//_storePos.scaleTime(_model->getTimeNormConstant());
-	Storage::printResult(&_storePos,aBaseName+"_"+getName()+"_pos",aDir,aDT,aExtension);
+	Storage::printResult(&_storePos, aBaseName + "_" + getName() + "_pos", aDir, aDT, aExtension);
 
 	// VELOCITIES
-
+	Storage::printResult(&_storeVel, aBaseName + "_" + getName() + "_vel", aDir, aDT, aExtension);
 
 	// ACCELERATIONS
+	Storage::printResult(&_storeAcc, aBaseName + "_" + getName() + "_acc", aDir, aDT, aExtension);
 
 	return(0);
 }

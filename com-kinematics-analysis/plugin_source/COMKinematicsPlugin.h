@@ -22,6 +22,11 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
+ 
+// Modified by Prasanna Sritharan, July 2018
+// Added new code as per tutorial: output velocities and accelerations
+
+
 
 //=============================================================================
 // INCLUDES
@@ -100,11 +105,16 @@ public:
 	// Indices of bodies for kinematics to be reported
 	Array<int> _bodyIndices;
 
-	/** Storage for recording body positions. */
-	Storage _storePos;
+	// Storage for recording body positions, velocities and accelerations
+	Storage _storePos, _storeVel, _storeAcc;
 
-	/** Internal work arrays to hold body positions at each time step. */
-	Array<double> _bodypos;
+	// Internal work arrays to hold body positions, velocities and accelerations at each time step
+	Array<double> _bodypos, _bodyvel, _bodyacc;
+
+
+
+
+
 
 //=============================================================================
 // METHODS

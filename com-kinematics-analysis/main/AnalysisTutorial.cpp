@@ -1,3 +1,9 @@
+/* OPENSIM ANALYSIS TUTORIAL - MAIN PROGRAM
+ * Prasanna Sritharan, July 2018 
+ */
+
+
+
 #include <OpenSim/OpenSim.h>
 #include <COMKinematicsPlugin.h>
 //#include <RegisterTypes_osimPlugin.h> // not required when creating an instance of COMKinematicsPlugin
@@ -40,7 +46,7 @@ int main()
 
 		// analysis tool parameters
 		String toolname = "subject01";
-		String resdir = "C:\\Users\\psritharan\\Documents\\03 Projects\\opensim-cpp-tutorials\\com-kinematics-analysis\\main\\test_data\\Results";
+		String resdir = "Results";
 		int outprec = 20;
 		double lpass = 6.0;
 
