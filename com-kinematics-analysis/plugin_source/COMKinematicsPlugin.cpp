@@ -21,6 +21,11 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
+ // Modified by Prasanna Sritharan, July 2018
+ // Added new code as per tutorial: output velocities and accelerations
+
+
+
 //=============================================================================
 // INCLUDES
 //=============================================================================
