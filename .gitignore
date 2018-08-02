@@ -4,9 +4,8 @@
 dynamic-walker/build
 
 # arm muscle optimisation
-optimisation-arm/build/
+optimisation-arm/build
 
 # kinematics analysis tool
-com-kinematics-analysis/main/build/
-com-kinematics-analysis/plugin_source/build/
-john/test
+com-kinematics-analysis/main/build
+com-kinematics-analysis/plugin_source/build
