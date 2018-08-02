@@ -12,7 +12,7 @@ SET(EXPORT_MACRO OSIM${UKIT}_EXPORTS)
 SET(OPENSIM_INSTALL_DIR $ENV{OPENSIM_HOME} 
 		CACHE PATH "Top-level directory of OpenSim install")
 		
-SET(PLUGIN_NAME "osimPlugin" CACHE STRING "Name of shared library to create")
+SET(PLUGIN_NAME "COMKinematicsPlugin" CACHE STRING "Name of shared library to create")
 
 # To add Debug feature add ";Debug" after Release on the line below
 SET(CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Release" 
